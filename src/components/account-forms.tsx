@@ -1,10 +1,22 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { updateContactAction, updatePasswordAction } from "@/app/account/actions";
+import { useToast } from "@/components/toast-provider";
 
 export function UpdateContactForm({ currentContact }: { currentContact: string }) {
   const [state, formAction, pending] = useActionState(updateContactAction, undefined);
+  const showToast = useToast();
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    if (wasPending.current && !pending) {
+      if (state?.error) showToast(state.error, "error");
+      else if (state?.success) showToast("Contact number updated.", "success");
+    }
+    wasPending.current = pending;
+  }, [pending, state, showToast]);
+
   return (
     <form action={formAction} className="bg-bg-raised border border-line rounded-2xl p-5 flex flex-col gap-3 max-w-md">
       <h2 className="font-display font-semibold text-lg">Contact number</h2>
@@ -29,6 +41,17 @@ export function UpdateContactForm({ currentContact }: { currentContact: string }
 
 export function UpdatePasswordForm() {
   const [state, formAction, pending] = useActionState(updatePasswordAction, undefined);
+  const showToast = useToast();
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    if (wasPending.current && !pending) {
+      if (state?.error) showToast(state.error, "error");
+      else if (state?.success) showToast("Password updated.", "success");
+    }
+    wasPending.current = pending;
+  }, [pending, state, showToast]);
+
   return (
     <form action={formAction} className="bg-bg-raised border border-line rounded-2xl p-5 flex flex-col gap-3 max-w-md">
       <h2 className="font-display font-semibold text-lg">Password</h2>

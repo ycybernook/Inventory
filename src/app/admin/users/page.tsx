@@ -70,7 +70,7 @@ export default async function AdminUsersPage() {
                   <td className="px-4 py-3 text-ink-faint">{s.email ?? "—"}</td>
                   {isOwner && (
                     <td className="px-4 py-3">
-                      <StaffRowActions id={s.id} isActive={s.is_active} />
+                      <StaffRowActions id={s.id} isActive={s.is_active} fullName={s.full_name} />
                     </td>
                   )}
                 </tr>

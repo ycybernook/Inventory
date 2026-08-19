@@ -1,11 +1,25 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { saveProductAction } from "@/app/admin/products/actions";
 import type { Category, Product } from "@/lib/database.types";
+import { useToast } from "@/components/toast-provider";
 
 export function ProductForm({ product, categories }: { product?: Product; categories: Category[] }) {
   const [state, formAction, pending] = useActionState(saveProductAction, undefined);
+  const showToast = useToast();
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    if (wasPending.current && !pending) {
+      if (state?.error) {
+        showToast(state.error, "error");
+      } else {
+        showToast(product ? "Product updated." : "Product added.", "success");
+      }
+    }
+    wasPending.current = pending;
+  }, [pending, state, showToast, product]);
 
   return (
     <form action={formAction} className="bg-bg-raised border border-line rounded-2xl p-6 flex flex-col gap-4 max-w-xl">

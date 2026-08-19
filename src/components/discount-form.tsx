@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { applyDiscountAction } from "@/app/orders/[id]/actions";
 import { peso } from "@/lib/format";
+import { useToast } from "@/components/toast-provider";
 
 export function DiscountForm({
   orderId,
@@ -17,6 +18,19 @@ export function DiscountForm({
 }) {
   const action = applyDiscountAction.bind(null, orderId);
   const [state, formAction, pending] = useActionState(action, undefined);
+  const showToast = useToast();
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    if (wasPending.current && !pending) {
+      if (state?.error) {
+        showToast(state.error, "error");
+      } else {
+        showToast("Discount applied.", "success");
+      }
+    }
+    wasPending.current = pending;
+  }, [pending, state, showToast]);
 
   return (
     <form action={formAction} className="bg-bg-raised border border-line rounded-2xl p-5 flex flex-col gap-3">

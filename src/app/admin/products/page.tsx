@@ -51,7 +51,7 @@ export default async function AdminProductsPage() {
                     {p.stock_qty}
                   </td>
                   <td className="px-4 py-3">
-                    <ProductRowActions id={p.id} isActive={p.is_active} canDelete={canDelete} />
+                    <ProductRowActions id={p.id} isActive={p.is_active} canDelete={canDelete} name={p.name} />
                   </td>
                 </tr>
               ))}

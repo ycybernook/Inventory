@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import type { OrderStatus } from "@/lib/database.types";
 import { transitionOrderAction } from "@/app/admin/orders/actions";
+import { useToast } from "@/components/toast-provider";
 
 export function TransitionButton({
   orderId,
@@ -19,6 +20,7 @@ export function TransitionButton({
 }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const showToast = useToast();
 
   const classes =
     variant === "primary"
@@ -36,8 +38,11 @@ export function TransitionButton({
     startTransition(async () => {
       try {
         await transitionOrderAction(orderId, to, note);
+        showToast(`${label} — done.`, "success");
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Action failed.");
+        const message = e instanceof Error ? e.message : "Action failed.";
+        setError(message);
+        showToast(message, "error");
       }
     });
   }

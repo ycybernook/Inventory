@@ -1,12 +1,26 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { createStaffAction, updateStaffAction, type UserActionState } from "@/app/admin/users/actions";
 import type { Profile } from "@/lib/database.types";
+import { useToast } from "@/components/toast-provider";
 
 export function StaffForm({ staff }: { staff?: Profile }) {
   const action = staff ? updateStaffAction.bind(null, staff.id) : createStaffAction;
   const [state, formAction, pending] = useActionState<UserActionState, FormData>(action, undefined);
+  const showToast = useToast();
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    if (wasPending.current && !pending) {
+      if (state?.error) {
+        showToast(state.error, "error");
+      } else {
+        showToast(staff ? "Account updated." : "Account created.", "success");
+      }
+    }
+    wasPending.current = pending;
+  }, [pending, state, showToast, staff]);
 
   return (
     <form action={formAction} className="bg-bg-raised border border-line rounded-2xl p-6 flex flex-col gap-4 max-w-lg">

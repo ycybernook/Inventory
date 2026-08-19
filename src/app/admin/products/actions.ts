@@ -40,16 +40,22 @@ export async function saveProductAction(_prevState: ProductActionState, formData
   revalidatePath("/dashboard");
 }
 
-export async function deleteProductAction(id: string) {
+export type SimpleResult = { error?: string };
+
+export async function deleteProductAction(id: string): Promise<SimpleResult> {
   const supabase = await createClient();
-  await supabase.from("products").delete().eq("id", id);
+  const { error } = await supabase.from("products").delete().eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/admin/products");
   revalidatePath("/catalog");
+  return {};
 }
 
-export async function toggleActiveAction(id: string, isActive: boolean) {
+export async function toggleActiveAction(id: string, isActive: boolean): Promise<SimpleResult> {
   const supabase = await createClient();
-  await supabase.from("products").update({ is_active: isActive }).eq("id", id);
+  const { error } = await supabase.from("products").update({ is_active: isActive }).eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/admin/products");
   revalidatePath("/catalog");
+  return {};
 }

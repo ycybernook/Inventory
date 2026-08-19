@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import type { UserRole } from "@/lib/database.types";
 
 export type UserActionState = { error?: string } | undefined;
+export type SimpleResult = { error?: string };
 
 export async function createStaffAction(_prevState: UserActionState, formData: FormData): Promise<UserActionState> {
   const actor = await requireRole(["owner"]);
@@ -22,7 +23,13 @@ export async function createStaffAction(_prevState: UserActionState, formData: F
   if (password.length < 8) return { error: "Password must be at least 8 characters." };
   if (!["employee", "manager", "owner"].includes(role)) return { error: "Invalid role." };
 
-  const admin = createAdminClient();
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Admin client unavailable." };
+  }
+
   const authEmail = email ?? `staff-${contactNumber.replace(/[^0-9]/g, "")}@no-email.internal`;
 
   const { error } = await admin.auth.admin.createUser({
@@ -66,16 +73,28 @@ export async function updateStaffAction(id: string, _prevState: UserActionState,
   revalidatePath("/admin/users");
 }
 
-export async function deactivateStaffAction(id: string, isActive: boolean) {
+export async function deactivateStaffAction(id: string, isActive: boolean): Promise<SimpleResult> {
   await requireRole(["owner"]);
   const supabase = await createClient();
-  await supabase.from("profiles").update({ is_active: isActive }).eq("id", id);
+  const { error } = await supabase.from("profiles").update({ is_active: isActive }).eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/admin/users");
+  return {};
 }
 
-export async function deleteStaffAction(id: string) {
+export async function deleteStaffAction(id: string): Promise<SimpleResult> {
   await requireRole(["owner"]);
-  const admin = createAdminClient();
-  await admin.auth.admin.deleteUser(id);
+
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Admin client unavailable." };
+  }
+
+  const { error } = await admin.auth.admin.deleteUser(id);
+  if (error) return { error: error.message };
+
   revalidatePath("/admin/users");
+  return {};
 }
