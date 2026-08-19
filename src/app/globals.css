@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f7f4ee;
+  --bg-raised: #ffffff;
+  --ink: #221d16;
+  --ink-soft: #6e6656;
+  --ink-faint: #9c9483;
+  --line: #e4ddcc;
+  --line-strong: #d3c9b2;
+  --accent: #1f6f63;
+  --accent-ink: #0e4038;
+  --accent-soft: #e1eee9;
+  --accent-soft-line: #c4ddd4;
+  --good: #2e7d4f;
+  --good-soft: #e4f1e7;
+  --warn: #a8680f;
+  --warn-soft: #fbeed9;
+  --critical: #b4402c;
+  --critical-soft: #fbe6e1;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #18150f;
+    --bg-raised: #211d15;
+    --ink: #f1ece0;
+    --ink-soft: #b3a991;
+    --ink-faint: #7c7460;
+    --line: #35301f;
+    --line-strong: #453f29;
+    --accent: #5cb3a0;
+    --accent-ink: #bfe5da;
+    --accent-soft: #22322d;
+    --accent-soft-line: #345048;
+    --good: #6fbf8c;
+    --good-soft: #1e3327;
+    --warn: #e0a947;
+    --warn-soft: #3a2d14;
+    --critical: #e38774;
+    --critical-soft: #3a2019;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #18150f;
+  --bg-raised: #211d15;
+  --ink: #f1ece0;
+  --ink-soft: #b3a991;
+  --ink-faint: #7c7460;
+  --line: #35301f;
+  --line-strong: #453f29;
+  --accent: #5cb3a0;
+  --accent-ink: #bfe5da;
+  --accent-soft: #22322d;
+  --accent-soft-line: #345048;
+  --good: #6fbf8c;
+  --good-soft: #1e3327;
+  --warn: #e0a947;
+  --warn-soft: #3a2d14;
+  --critical: #e38774;
+  --critical-soft: #3a2019;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-raised: var(--bg-raised);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-critical: var(--critical);
+  --color-critical-soft: var(--critical-soft);
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-public-sans);
+  --font-data: var(--font-plex-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body), -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
