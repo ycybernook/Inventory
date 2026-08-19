@@ -72,3 +72,27 @@ export async function markReceivedAction(orderId: string) {
   await supabase.rpc("transition_order_status", { p_order_id: orderId, p_new_status: "completed" });
   revalidatePath(`/orders/${orderId}`);
 }
+
+export type DiscountActionState = { error?: string } | undefined;
+
+export async function applyDiscountAction(
+  orderId: string,
+  _prevState: DiscountActionState,
+  formData: FormData
+): Promise<DiscountActionState> {
+  const supabase = await createClient();
+  const amount = Number(formData.get("discount_amount") || 0);
+  const reason = String(formData.get("discount_reason") || "") || null;
+
+  if (Number.isNaN(amount) || amount < 0) return { error: "Enter a valid discount amount." };
+
+  const { error } = await supabase.rpc("apply_order_discount", {
+    p_order_id: orderId,
+    p_discount_amount: amount,
+    p_discount_reason: reason,
+  });
+  if (error) return { error: error.message };
+
+  revalidatePath(`/orders/${orderId}`);
+  revalidatePath("/admin/orders");
+}

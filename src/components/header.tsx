@@ -57,6 +57,11 @@ export function Header({ profile, cartCount = 0 }: { profile: Profile | null; ca
               Users
             </Link>
           )}
+          {profile?.role === "owner" && (
+            <Link href="/admin/reports" className="px-3 py-2 rounded-md text-ink-soft hover:bg-accent-soft hover:text-ink">
+              Reports
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center gap-3">

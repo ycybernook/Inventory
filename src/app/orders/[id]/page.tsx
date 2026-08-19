@@ -8,6 +8,7 @@ import { ORDER_WORKFLOW, ORDER_STATUS_META } from "@/lib/order-status";
 import type { Order, OrderItem, OrderStatusHistory } from "@/lib/database.types";
 import { PaymentForm } from "@/components/payment-form";
 import { MarkReceivedButton } from "@/components/mark-received-button";
+import { DiscountForm } from "@/components/discount-form";
 
 export default async function OrderDetailPage({ params }: PageProps<"/orders/[id]">) {
   const { id } = await params;
@@ -66,9 +67,21 @@ export default async function OrderDetailPage({ params }: PageProps<"/orders/[id
                   <p className="font-data font-semibold">{peso(it.line_total)}</p>
                 </div>
               ))}
-              <div className="p-4 flex items-center justify-between font-semibold">
-                <span>Total</span>
-                <span className="font-data">{peso(o.total)}</span>
+              <div className="p-4 flex flex-col gap-1.5">
+                <div className="flex items-center justify-between text-sm text-ink-soft">
+                  <span>Subtotal</span>
+                  <span className="font-data">{peso(o.subtotal)}</span>
+                </div>
+                {o.discount_amount > 0 && (
+                  <div className="flex items-center justify-between text-sm text-good">
+                    <span>Discount{o.discount_reason ? ` — ${o.discount_reason}` : ""}</span>
+                    <span className="font-data">−{peso(o.discount_amount)}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between font-semibold pt-1.5 border-t border-line">
+                  <span>Total</span>
+                  <span className="font-data">{peso(o.total)}</span>
+                </div>
               </div>
             </div>
 
@@ -91,6 +104,15 @@ export default async function OrderDetailPage({ params }: PageProps<"/orders/[id
           </div>
 
           <div className="flex flex-col gap-4">
+            {profile.role === "owner" && ["pending_approval", "for_payment"].includes(o.status) && (
+              <DiscountForm
+                orderId={o.id}
+                subtotal={o.subtotal}
+                currentDiscount={o.discount_amount}
+                currentReason={o.discount_reason}
+              />
+            )}
+
             {isOwnerOfOrder && o.status === "for_payment" && <PaymentForm orderId={o.id} total={o.total} />}
 
             {isOwnerOfOrder && o.status === "for_confirmation" && (
@@ -101,6 +123,15 @@ export default async function OrderDetailPage({ params }: PageProps<"/orders/[id
                 </p>
                 <MarkReceivedButton orderId={o.id} />
               </div>
+            )}
+
+            {o.receipt_issued_at && (
+              <a
+                href={`/orders/${o.id}/receipt`}
+                className="rounded-lg border border-line-strong bg-bg-raised text-center font-semibold py-2.5 text-sm hover:bg-accent-soft"
+              >
+                View / print receipt
+              </a>
             )}
 
             <div className="bg-bg-raised border border-line rounded-2xl p-5 text-sm text-ink-soft">
